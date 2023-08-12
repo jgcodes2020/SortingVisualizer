@@ -6,7 +6,9 @@ using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using SortingVisualizer.Rendering;
 using SortingVisualizer.Rendering.OpenGL;
+using SortingVisualizer.Sorting.Basic;
 using VertexArray = SortingVisualizer.Rendering.OpenGL.VertexArray;
+
 
 namespace SortingVisualizer;
 
@@ -14,25 +16,38 @@ public static class Program
 {
     private static readonly uint[] VertexData =
     {
-        1, 0xFF_FF0000,
-        2, 0xFF_FF8800,
-        3, 0xFF_FFFF00,
-        4, 0xFF_00FF00,
-        5, 0xFF_00FFFF,
-        6, 0xFF_0000FF,
-        7, 0xFF_4400FF,
-        8, 0xFF_8800FF,
-        9, 0xFF_FF00FF,
-        10, 0xFF_FF0000,
+        1, 
+        2, 
+        3, 
+        4, 
+        5, 
+        6, 
+        7, 
+        8, 
+        9, 
+        10, 
     };
+
+    private static readonly uint[] Palette =
+    {
+        0xFF_FF0000,
+        0xFF_FF8800,
+        0xFF_FFFF00,
+        0xFF_00FF00,
+        0xFF_00FFFF,
+        0xFF_0000FF,
+        0xFF_4400FF,
+        0xFF_8800FF,
+        0xFF_FF00FF,
+        0xFF_FF0000,
+    };
+    
     
     private static IWindow _window = null!;
     private static IInputContext _input = null!;
     private static GL _gl = null!;
 
-    private static VertexArray _vao;
-    private static BufferObject _vbo;
-    private static ShaderProgram _shader;
+    private static SceneManager _scene;
     
     public static void Main(string[] args)
     {
@@ -71,31 +86,7 @@ public static class Program
     {
         _gl.ClearColor(Color.Black);
         
-        _shader = new ShaderProgram(_gl, new ShaderList
-        {
-            { ShaderType.VertexShader, new Uri("netres://SortingVisualizer/Assets/Shaders/bars.vert") },
-            { ShaderType.GeometryShader, new Uri("netres://SortingVisualizer/Assets/Shaders/bars.geom") },
-            { ShaderType.FragmentShader, new Uri("netres://SortingVisualizer/Assets/Shaders/bars.frag") }
-        });
-        _shader.Uniform(0, new Vector2(10.0f, 10.0f));
-        
-        _vbo = new BufferObject(_gl, VertexBufferObjectUsage.StaticDraw);
-        _vbo.LoadData<uint>(VertexData);
-
-        _vao = new VertexArray(_gl);
-        _vao.AttachVertexBuffer(0, 
-            buffer: _vbo, 
-            elementSize: 2 * sizeof(uint));
-        _vao.SetupAttributeI(0, 
-            bindIndex: 0, 
-            count: 1, 
-            type: VertexAttribIType.UnsignedInt, 
-            offset: 0);
-        _vao.SetupAttributeI(1, 
-            bindIndex: 0, 
-            count: 1, 
-            type: VertexAttribIType.UnsignedInt, 
-            offset: 1 * sizeof(uint));
+        _scene = new SceneManager(_gl, 20, len => new InsertionSort((uint) len));
     }
     
     private static void OnUpdate(double dt)
@@ -105,10 +96,6 @@ public static class Program
     private static void OnRender(double dt)
     {
         _gl.Clear(ClearBufferMask.ColorBufferBit);
-        
-        _shader.MakeCurrent();
-        _vao.MakeCurrent();
-        _gl.Viewport(_window.Size);
-        _gl.DrawArrays(PrimitiveType.Points, 0, 10);
+        _scene.Render();
     }
 }

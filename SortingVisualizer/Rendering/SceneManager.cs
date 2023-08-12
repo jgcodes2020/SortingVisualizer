@@ -28,17 +28,22 @@ public class SceneManager
         _paletteBuffer.LoadData(_algorithm.Palette);
 
         _vertexArray = new VertexArray(_gl);
-        _vertexArray.AttachVertexBuffer(0, _dataBuffer, sizeof(uint));
-        _vertexArray.AttachVertexBuffer(1, _paletteBuffer, sizeof(uint));
-        
+        _vertexArray.AttachVertexBuffer(0, 
+            buffer: _dataBuffer, 
+            elementSize: sizeof(uint));
+        _vertexArray.AttachVertexBuffer(1, 
+            buffer: _paletteBuffer, 
+            elementSize: sizeof(uint));
         _vertexArray.SetupAttributeI(0,
             bindIndex: 0,
             count: 1,
-            type: VertexAttribIType.UnsignedInt);
-        _vertexArray.SetupAttributeI(0,
+            type: VertexAttribIType.UnsignedInt,
+            offset: 0);
+        _vertexArray.SetupAttributeI(1,
             bindIndex: 1,
             count: 1,
-            type: VertexAttribIType.UnsignedInt);
+            type: VertexAttribIType.UnsignedInt,
+            offset: 0);
         
         _shader = new ShaderProgram(_gl, new ShaderList
         {
@@ -59,6 +64,6 @@ public class SceneManager
     {
         _shader.MakeCurrent();
         _vertexArray.MakeCurrent();
-        _gl.DrawArrays(PrimitiveType.Points, 0, 10);
+        _gl.DrawArrays(PrimitiveType.Points, 0, (uint) _algorithm.Data.Length);
     }
 }
