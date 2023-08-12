@@ -1,4 +1,4 @@
-namespace SortingVisualizer.Sorting.Basic;
+namespace SortingVisualizer.Sorting.Common;
 
 public class InsertionSort : SortingAlgorithm
 {
@@ -17,21 +17,19 @@ public class InsertionSort : SortingAlgorithm
                     break;
 
                 (RawData[j], RawData[j - 1]) = (RawData[j - 1], RawData[j]);
-                TriggerSync();
-
-                
+                SyncPoint(i, j);
             }
         }
         return;
-        
-        void TriggerSync()
-        {
-            Array.Fill(RawPalette, 0xFF_FFFFFF);
-            RawPalette[i] = 0xFF_00CC00;
-            RawPalette[j] = 0xFF_CC0000;
-            if (j >= 1)
-                RawPalette[j - 1] = 0xFF_CC0000;
-            SyncPoint();
-        }
+    }
+
+    private void SyncPoint(int i, int j)
+    {
+        Array.Fill(RawPalette, 0xFF_FFFFFF);
+        RawPalette[i] = 0xFF_00CC00;
+        RawPalette[j] = 0xFF_CC0000;
+        if (j >= 1)
+            RawPalette[j - 1] = 0xFF_CC0000;
+        SyncPoint();
     }
 }

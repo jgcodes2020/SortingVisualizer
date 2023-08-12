@@ -29,9 +29,9 @@ public class SceneManager
     
     private SortingAlgorithm _algorithm;
 
-    public SceneManager(GL gl, IInputContext input, int length, Func<int, SortingAlgorithm> factory)
+    public SceneManager(GL gl, IInputContext input, SortingAlgorithm algorithm)
     {
-        _algorithm = factory(length);
+        _algorithm = algorithm;
         InitOpenGL(gl);
         InitInput(input);
     }

@@ -6,7 +6,7 @@ using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using SortingVisualizer.Rendering;
 using SortingVisualizer.Rendering.OpenGL;
-using SortingVisualizer.Sorting.Basic;
+using SortingVisualizer.Sorting.Common;
 using VertexArray = SortingVisualizer.Rendering.OpenGL.VertexArray;
 
 
@@ -14,35 +14,6 @@ namespace SortingVisualizer;
 
 public static class Program
 {
-    private static readonly uint[] VertexData =
-    {
-        1, 
-        2, 
-        3, 
-        4, 
-        5, 
-        6, 
-        7, 
-        8, 
-        9, 
-        10, 
-    };
-
-    private static readonly uint[] Palette =
-    {
-        0xFF_FF0000,
-        0xFF_FF8800,
-        0xFF_FFFF00,
-        0xFF_00FF00,
-        0xFF_00FFFF,
-        0xFF_0000FF,
-        0xFF_4400FF,
-        0xFF_8800FF,
-        0xFF_FF00FF,
-        0xFF_FF0000,
-    };
-    
-    
     private static IWindow _window = null!;
     private static IInputContext _input = null!;
     private static GL _gl = null!;
@@ -51,11 +22,11 @@ public static class Program
     
     public static void Main(string[] args)
     {
-        Console.WriteLine("Available resources:");
-        foreach (var resourceName in typeof(Program).Assembly.GetManifestResourceNames())
-        {
-            Console.WriteLine($"- {resourceName}");
-        }
+        // Console.WriteLine("Available resources:");
+        // foreach (var resourceName in typeof(Program).Assembly.GetManifestResourceNames())
+        // {
+        //     Console.WriteLine($"- {resourceName}");
+        // }
         
         _window = Window.Create(WindowOptions.Default with
         {
@@ -86,7 +57,7 @@ public static class Program
     {
         _gl.ClearColor(Color.Black);
         
-        _scene = new SceneManager(_gl, _input, 200, len => new InsertionSort((uint) len) { SyncDelay = TimeSpan.FromMilliseconds(10) });
+        _scene = new SceneManager(_gl, _input, new MergeSort(100) { SyncDelay = TimeSpan.FromMilliseconds(10) });
     }
     
     private static void OnUpdate(double dt)
