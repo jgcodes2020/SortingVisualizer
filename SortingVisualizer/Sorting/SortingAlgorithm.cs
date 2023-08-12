@@ -47,26 +47,29 @@ public abstract class SortingAlgorithm
 
     protected abstract void DoSorting();
 
-    public Thread CreateSortingThread()
+    protected virtual void DoReset()
     {
-        return new Thread(() =>
+        Array.Fill(RawPalette, 0xFF_FFFFFF);
+    }
+
+    public void StartSync()
+    {
+        _genericStopEvent.Reset();
+        _state = PlayState.Run;
+        try
         {
-            _genericStopEvent.Reset();
-            _state = PlayState.Run;
-            try
-            {
-                DoSorting();
-            }
-            catch (OperationCanceledException)
-            {
-                // ignored
-            }
-            finally
-            {
-                _state = PlayState.Stop;
-                _genericStopEvent.Set();
-            }
-        });
+            DoSorting();
+        }
+        catch (OperationCanceledException)
+        {
+            // ignored
+        }
+        finally
+        {
+            _state = PlayState.Stop;
+            _genericStopEvent.Set();
+            DoReset();
+        }
     }
 
     protected void SyncPoint()
@@ -113,6 +116,18 @@ public abstract class SortingAlgorithm
         _stopRequested = true;
         _advanceEvent.Set();
         _genericStopEvent.WaitOne();
+    }
+
+    public void Shuffle()
+    {
+        Stop();
+        ArrayHelpers.Shuffle(RawData);
+    }
+
+    public void Reset()
+    {
+        Stop();
+        Array.Sort(RawData);
     }
 
     public void Pause()

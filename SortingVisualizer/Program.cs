@@ -86,11 +86,12 @@ public static class Program
     {
         _gl.ClearColor(Color.Black);
         
-        _scene = new SceneManager(_gl, 20, len => new InsertionSort((uint) len));
+        _scene = new SceneManager(_gl, _input, 200, len => new InsertionSort((uint) len) { SyncDelay = TimeSpan.FromMilliseconds(10) });
     }
     
     private static void OnUpdate(double dt)
     {
+        _scene.Update(_input);
     }
     
     private static void OnRender(double dt)
