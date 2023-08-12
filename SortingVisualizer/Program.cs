@@ -6,6 +6,7 @@ using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using SortingVisualizer.Rendering;
 using SortingVisualizer.Rendering.OpenGL;
+using SortingVisualizer.Sorting;
 using SortingVisualizer.Sorting.Common;
 using VertexArray = SortingVisualizer.Rendering.OpenGL.VertexArray;
 
@@ -57,7 +58,10 @@ public static class Program
     {
         _gl.ClearColor(Color.Black);
         
-        _scene = new SceneManager(_gl, _input, new MergeSort(100) { SyncDelay = TimeSpan.FromMilliseconds(10) });
+        _scene = new SceneManager(_gl, _input, SortingAlgorithm.SelectInteractive(algorithm =>
+        {
+            algorithm.SyncDelay = TimeSpan.FromMilliseconds(10);
+        }));
     }
     
     private static void OnUpdate(double dt)

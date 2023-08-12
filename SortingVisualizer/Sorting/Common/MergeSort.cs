@@ -4,7 +4,7 @@ public class MergeSort : SortingAlgorithm
 {
     private uint[] _dTemp;
     
-    public MergeSort(uint length) : base(length)
+    public MergeSort(int length) : base(length)
     {
         _dTemp = new uint[length];
     }
@@ -25,7 +25,6 @@ public class MergeSort : SortingAlgorithm
         DoSorting(begin, mid);
         DoSorting(mid, end);
         
-        Console.WriteLine($"- {begin}, {end}");
         // merge the two arrays
         {
             int it = 0;

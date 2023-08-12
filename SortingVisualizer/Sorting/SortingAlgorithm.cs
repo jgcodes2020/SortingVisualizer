@@ -32,7 +32,7 @@ public abstract class SortingAlgorithm
     private AutoResetEvent _advanceEvent;
     private ManualResetEvent _genericStopEvent;
 
-    protected SortingAlgorithm(uint length)
+    protected SortingAlgorithm(int length)
     {
         RawData = new uint[length];
         RawPalette = new uint[length];
@@ -78,15 +78,16 @@ public abstract class SortingAlgorithm
         {
             if (!_advanceEvent.WaitOne(SyncDelay))
                 return;
-        
+
             if (_stopRequested)
             {
                 throw new OperationCanceledException();
             }
-            if (!_requestPauseState) 
+
+            if (!_requestPauseState)
                 return;
         }
-        
+
         _state = PlayState.Pause;
         _genericStopEvent.Set();
         _advanceEvent.WaitOne();
@@ -95,16 +96,19 @@ public abstract class SortingAlgorithm
         {
             throw new OperationCanceledException();
         }
+
         if (!_requestPauseState)
         {
             _state = PlayState.Run;
             return;
         }
+
         if (Interlocked.Exchange(ref _advanceRequested, 0) != 0)
         {
             _state = PlayState.Advance;
             return;
         }
+
         Debug.Fail("Pause notified, nothing changed!!");
     }
 
@@ -144,8 +148,68 @@ public abstract class SortingAlgorithm
     {
         if (_state == PlayState.Stop || !_requestPauseState)
             return;
-        
+
         _requestPauseState = false;
         _advanceEvent.Set();
+    }
+
+    // STATIC HELPER METHODS
+    // =====================
+
+    public static SortingAlgorithm SelectInteractive(Action<SortingAlgorithm>? postInit = null)
+    {
+        var assembly = typeof(SortingAlgorithm).Assembly;
+        var algList = assembly
+            .GetTypes()
+            .Where(t => t.Namespace!.StartsWith("SortingVisualizer.Sorting."))
+            .ToArray();
+        Console.WriteLine("Available algorithms: ");
+        foreach (var (alg, index) in algList.Select((x, i) => (x, i)))
+        {
+            Console.WriteLine($"{(index + 1),2}. {alg.FullName!.Replace("SortingVisualizer.Sorting.", "")}");
+        }
+
+        Type selectedAlg;
+        while (true)
+        {
+            Console.Write($"Input the number of the algorithm [1-{algList.Length}]: ");
+            if (!int.TryParse(Console.ReadLine()!, out var input))
+            {
+                Console.WriteLine("Not a valid number!");
+                continue;
+            }
+
+            int trueIndex = input - 1;
+            if (trueIndex >= algList.Length || trueIndex < 0)
+            {
+                Console.WriteLine("Index not in range!");
+                continue;
+            }
+
+            selectedAlg = algList[trueIndex];
+            break;
+        }
+
+        int length;
+        while (true)
+        {
+            Console.Write("Input a POSITIVE length: ");
+            if (!int.TryParse(Console.ReadLine()!, out length))
+            {
+                Console.WriteLine("Not a valid number!");
+                continue;
+            }
+
+            if (length < 0)
+            {
+                Console.WriteLine("Not a valid length!");
+                continue;
+            }
+            break;
+        }
+
+        var res = (SortingAlgorithm) Activator.CreateInstance(selectedAlg, length)!;
+        postInit?.Invoke(res);
+        return res;
     }
 }

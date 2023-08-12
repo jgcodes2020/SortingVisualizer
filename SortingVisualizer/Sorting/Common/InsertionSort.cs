@@ -2,7 +2,7 @@ namespace SortingVisualizer.Sorting.Common;
 
 public class InsertionSort : SortingAlgorithm
 {
-    public InsertionSort(uint length) : base(length)
+    public InsertionSort(int length) : base(length)
     {
     }
 
