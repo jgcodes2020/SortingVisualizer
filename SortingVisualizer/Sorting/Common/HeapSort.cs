@@ -63,14 +63,12 @@ public class HeapSort : SortingAlgorithm
     private void SyncPointSift(int heapLimit, int startPos, int pos, int left, int right)
     {
         FillHeapColours(heapLimit);
-        if (pos >= 0)
-            _palette[pos] = 0xFF_CC0000;
+        _palette[pos] = 0xFF_CC0000;
+        _palette[startPos] = 0xFF_0066CC;
         if (left >= 0 && left < heapLimit)
             _palette[left] = 0xFF_00CC00;
         if (right >= 0 && right < heapLimit)
             _palette[right] = 0xFF_00CC00;
-        if (startPos >= 0)
-            _palette[pos] = 0xFF_0000CC;
         
         SyncPoint();
     }

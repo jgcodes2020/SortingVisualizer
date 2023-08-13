@@ -121,17 +121,11 @@ public abstract class SortingAlgorithm
         _advanceEvent.Set();
         _genericStopEvent.WaitOne();
     }
-
-    public void Shuffle()
+    
+    public void Reset(Action<uint[]> permuter)
     {
         Stop();
-        ArrayHelpers.Shuffle(_data);
-    }
-
-    public void Reset()
-    {
-        Stop();
-        Array.Sort(_data);
+        permuter(_data);
     }
 
     public void Pause()

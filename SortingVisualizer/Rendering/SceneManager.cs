@@ -17,6 +17,8 @@ public class SceneManager
         None = 0,
         Shuffle = (1 << 0),
         Start = (1 << 1),
+        Reverse = (1 << 2),
+        
     }
     
     private GL _gl;
@@ -89,24 +91,37 @@ public class SceneManager
         switch (key)
         {
             case Key.F1:
-                InterlockedExt.Or(ref _tracker, KeybindMask.Shuffle);
+                InterlockedExt.Or(ref _tracker, KeybindMask.Start);
                 break;
             case Key.F2:
-                InterlockedExt.Or(ref _tracker, KeybindMask.Start);
+                InterlockedExt.Or(ref _tracker, KeybindMask.Shuffle);
+                break;
+            case Key.F3:
+                InterlockedExt.Or(ref _tracker, KeybindMask.Reverse);
                 break;
         }
     }
 
     public void Update(IInputContext input)
     {
-        if ((InterlockedExt.And(ref _tracker, ~KeybindMask.Shuffle) & KeybindMask.Shuffle) != 0)
+        bool CheckAndClear(KeybindMask flag)
         {
-            _algorithm.Shuffle();
+            return (InterlockedExt.And(ref _tracker, ~flag) & flag) != 0;
         }
+        
 
-        if ((InterlockedExt.And(ref _tracker, ~KeybindMask.Start) & KeybindMask.Start) != 0)
+        if (CheckAndClear(KeybindMask.Start))
         {
             Task.Run(() => _algorithm.StartSync());
+        }
+        if (CheckAndClear(KeybindMask.Shuffle))
+        {
+            _algorithm.Reset(ArrayHelpers.Shuffle);
+        }
+
+        if (CheckAndClear(KeybindMask.Reverse))
+        {
+            _algorithm.Reset(Array.Reverse);
         }
     }
 
