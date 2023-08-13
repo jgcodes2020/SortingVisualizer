@@ -20,14 +20,11 @@ public static class Program
     private static GL _gl = null!;
 
     private static SceneManager _scene;
+    private static SortingAlgorithm _algorithm;
     
     public static void Main(string[] args)
     {
-        // Console.WriteLine("Available resources:");
-        // foreach (var resourceName in typeof(Program).Assembly.GetManifestResourceNames())
-        // {
-        //     Console.WriteLine($"- {resourceName}");
-        // }
+        _algorithm = SortingAlgorithm.SelectInteractive();
         
         _window = Window.Create(WindowOptions.Default with
         {
@@ -58,10 +55,7 @@ public static class Program
     {
         _gl.ClearColor(Color.Black);
         
-        _scene = new SceneManager(_gl, _input, SortingAlgorithm.SelectInteractive(algorithm =>
-        {
-            algorithm.SyncDelay = TimeSpan.FromMilliseconds(10);
-        }));
+        _scene = new SceneManager(_gl, _input, _algorithm);
     }
     
     private static void OnUpdate(double dt)

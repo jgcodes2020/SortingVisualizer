@@ -10,13 +10,11 @@ public sealed class VertexArray : IDisposable
 {
     private GL _gl;
     internal readonly uint _handle;
-    private FixedBitSet _openSlots;
 
     public VertexArray(GL gl)
     {
         _gl = gl;
         _handle = _gl.CreateVertexArray();
-        _openSlots = new FixedBitSet(256);
     }
 
     public void MakeCurrent()

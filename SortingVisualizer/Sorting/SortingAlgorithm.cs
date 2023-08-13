@@ -18,12 +18,12 @@ public abstract class SortingAlgorithm
         Advance = 0x0001_0001,
     }
 
-    protected uint[] RawData { get; }
-    protected uint[] RawPalette { get; }
+    protected readonly uint[] _data;
+    protected readonly uint[] _palette;
     public TimeSpan SyncDelay { get; set; }
 
-    public ReadOnlySpan<uint> Data => RawData;
-    public ReadOnlySpan<uint> Palette => RawPalette;
+    public ReadOnlySpan<uint> Data => _data;
+    public ReadOnlySpan<uint> Palette => _palette;
 
     private PlayState _state;
     private bool _requestPauseState;
@@ -34,11 +34,11 @@ public abstract class SortingAlgorithm
 
     protected SortingAlgorithm(int length)
     {
-        RawData = new uint[length];
-        RawPalette = new uint[length];
+        _data = new uint[length];
+        _palette = new uint[length];
         SyncDelay = TimeSpan.FromMilliseconds(50);
-        ArrayHelpers.FillRange(RawData, 1U, 1U);
-        Array.Fill(RawPalette, 0xFF_FFFFFFU);
+        ArrayHelpers.FillRange(_data, 1U, 1U);
+        Array.Fill(_palette, 0xFF_FFFFFFU);
 
         _state = PlayState.Stop;
         _advanceEvent = new AutoResetEvent(false);
@@ -49,7 +49,7 @@ public abstract class SortingAlgorithm
 
     protected virtual void DoReset()
     {
-        Array.Fill(RawPalette, 0xFF_FFFFFF);
+        Array.Fill(_palette, 0xFF_FFFFFF);
     }
 
     public void StartSync()
@@ -125,13 +125,13 @@ public abstract class SortingAlgorithm
     public void Shuffle()
     {
         Stop();
-        ArrayHelpers.Shuffle(RawData);
+        ArrayHelpers.Shuffle(_data);
     }
 
     public void Reset()
     {
         Stop();
-        Array.Sort(RawData);
+        Array.Sort(_data);
     }
 
     public void Pause()
@@ -161,7 +161,7 @@ public abstract class SortingAlgorithm
         var assembly = typeof(SortingAlgorithm).Assembly;
         var algList = assembly
             .GetTypes()
-            .Where(t => t.Namespace!.StartsWith("SortingVisualizer.Sorting."))
+            .Where(t => t.Namespace!.StartsWith("SortingVisualizer.Sorting.") && t.IsSubclassOf(typeof(SortingAlgorithm)))
             .ToArray();
         Console.WriteLine("Available algorithms: ");
         foreach (var (alg, index) in algList.Select((x, i) => (x, i)))
@@ -208,7 +208,27 @@ public abstract class SortingAlgorithm
             break;
         }
 
+        TimeSpan syncDelay;
+        while (true)
+        {
+            Console.Write("Input a sync time duration (like 5s 300ms 2.1us): ");
+            try
+            {
+                syncDelay = ParseHelpers.ParseCombinedUnits(Console.ReadLine()!);
+                break;
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine("Invalid format!");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Invalid format...");
+            }
+        }
+
         var res = (SortingAlgorithm) Activator.CreateInstance(selectedAlg, length)!;
+        res.SyncDelay = syncDelay;
         postInit?.Invoke(res);
         return res;
     }

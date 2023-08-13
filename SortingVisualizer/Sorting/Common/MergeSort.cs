@@ -11,7 +11,7 @@ public class MergeSort : SortingAlgorithm
 
     protected override void DoSorting()
     {
-        DoSorting(0, RawData.Length);
+        DoSorting(0, _data.Length);
     }
 
     private void DoSorting(int begin, int end)
@@ -32,14 +32,14 @@ public class MergeSort : SortingAlgorithm
             while (il < mid && ir < end)
             {
                 SyncPoint(il, ir);
-                if (RawData[il] <= RawData[ir])
+                if (_data[il] <= _data[ir])
                 {
-                    _dTemp[it] = RawData[il];
+                    _dTemp[it] = _data[il];
                     il++;
                 }
                 else
                 {
-                    _dTemp[it] = RawData[ir];
+                    _dTemp[it] = _data[ir];
                     ir++;
                 }
 
@@ -49,7 +49,7 @@ public class MergeSort : SortingAlgorithm
             while (il < mid)
             {
                 SyncPoint(il);
-                _dTemp[it] = RawData[il];
+                _dTemp[it] = _data[il];
                 il++;
                 it++;
             }
@@ -57,7 +57,7 @@ public class MergeSort : SortingAlgorithm
             while (ir < end)
             {
                 SyncPoint(ir);
-                _dTemp[it] = RawData[ir];
+                _dTemp[it] = _data[ir];
                 ir++;
                 it++;
             }
@@ -66,17 +66,17 @@ public class MergeSort : SortingAlgorithm
         // copy back
         for (int i = 0; i < len; i++)
         {
-            RawData[begin + i] = _dTemp[i];
+            _data[begin + i] = _dTemp[i];
             SyncPoint(begin +i);
         }
     }
 
     private void SyncPoint(int a, int? b = null)
     {
-        Array.Fill(RawPalette, 0xFF_FFFFFF);
-        RawPalette[a] = 0xFF_CC0000;
+        Array.Fill(_palette, 0xFF_FFFFFF);
+        _palette[a] = 0xFF_CC0000;
         if (b.HasValue && b < Data.Length)
-            RawPalette[b.Value] = 0xFF_CC0000;
+            _palette[b.Value] = 0xFF_CC0000;
         SyncPoint();
     }
 }
