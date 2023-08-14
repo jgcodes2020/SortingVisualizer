@@ -1,8 +1,10 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using ImGuiNET;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
+using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 using SortingVisualizer.Rendering;
 using SortingVisualizer.Rendering.OpenGL;
@@ -19,13 +21,10 @@ public static class Program
     private static IInputContext _input = null!;
     private static GL _gl = null!;
 
-    private static SceneManager _scene;
-    private static SortingAlgorithm _algorithm;
+    private static ImGuiController _gui;
     
     public static void Main(string[] args)
     {
-        _algorithm = new HeapSort(new SortingAlgorithm.BufferSet(new uint[30], new uint[30])) { SyncDelay = TimeSpan.FromMilliseconds(30) };
-        
         _window = Window.Create(WindowOptions.Default with
         {
             Size = new Vector2D<int>(800, 600),
@@ -44,6 +43,8 @@ public static class Program
         _window.Center();
         _gl = _window.CreateOpenGL();
         _input = _window.CreateInput();
+
+        _gui = new ImGuiController(_gl, _window, _input);
         
         _window.MakeCurrent();
         _gl.CheckVersion(4, 5);
@@ -54,18 +55,21 @@ public static class Program
     private static unsafe void InitOpenGL()
     {
         _gl.ClearColor(Color.Black);
-        
-        _scene = new SceneManager(_gl, _input, _algorithm);
     }
     
     private static void OnUpdate(double dt)
     {
-        _scene.Update(_input);
+        _gui.Update((float) dt);
+        using (ImGuiExt.FillViewport())
+        {
+            ImGui.Text("Hello, world!");
+        }
     }
     
     private static void OnRender(double dt)
     {
-        _gl.Clear(ClearBufferMask.ColorBufferBit);
-        _scene.Render();
+        _gl.Viewport(new Vector2D<int>(0, 0), _window.FramebufferSize);
+        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        _gui.Render();
     }
 }

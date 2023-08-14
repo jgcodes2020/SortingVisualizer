@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using SortingVisualizer.Misc;
 
 namespace SortingVisualizer.Sorting;
@@ -18,12 +19,15 @@ public abstract class SortingAlgorithm
                 throw new ArgumentException("");
             Data = data;
             Palette = palette;
+
+            MaxValue = MemoryMarshal.ToEnumerable<uint>(data).Max();
         }
 
         public Memory<uint> Data { get; }
         public Memory<uint> Palette { get; }
 
         public int Length => Data.Length;
+        public uint MaxValue { get; }
     }
 
     [Flags]
