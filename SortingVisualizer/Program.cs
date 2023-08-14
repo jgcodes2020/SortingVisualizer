@@ -24,12 +24,12 @@ public static class Program
     
     public static void Main(string[] args)
     {
-        _algorithm = SortingAlgorithm.SelectInteractive();
+        _algorithm = new HeapSort(30) { SyncDelay = TimeSpan.FromMilliseconds(30) };
         
         _window = Window.Create(WindowOptions.Default with
         {
             Size = new Vector2D<int>(800, 600),
-            Title = "Sorting Visualizer"
+            Title = "Sorting Visualizer",
         });
         _window.Load += OnLoad;
         _window.Update += OnUpdate;
