@@ -3,15 +3,25 @@ namespace SortingVisualizer.Sorting.Common;
 public class MergeSort : SortingAlgorithm
 {
     private uint[] _dTemp;
-    
-    public MergeSort(int length) : base(length)
+
+    public MergeSort(BufferSet buffers) : base(buffers)
     {
-        _dTemp = new uint[length];
+        _dTemp = new uint[buffers.Length];
+    }
+
+    public override BufferSet Buffers
+    {
+        get => base.Buffers;
+        set
+        {
+            base.Buffers = value;
+            _dTemp = new uint[value.Length];
+        }
     }
 
     protected override void DoSorting()
     {
-        DoSorting(0, _data.Length);
+        DoSorting(0, Data.Length);
     }
 
     private void DoSorting(int begin, int end)
@@ -32,14 +42,14 @@ public class MergeSort : SortingAlgorithm
             while (il < mid && ir < end)
             {
                 SyncPoint(il, ir);
-                if (_data[il] <= _data[ir])
+                if (Data[il] <= Data[ir])
                 {
-                    _dTemp[it] = _data[il];
+                    _dTemp[it] = Data[il];
                     il++;
                 }
                 else
                 {
-                    _dTemp[it] = _data[ir];
+                    _dTemp[it] = Data[ir];
                     ir++;
                 }
 
@@ -49,7 +59,7 @@ public class MergeSort : SortingAlgorithm
             while (il < mid)
             {
                 SyncPoint(il);
-                _dTemp[it] = _data[il];
+                _dTemp[it] = Data[il];
                 il++;
                 it++;
             }
@@ -57,7 +67,7 @@ public class MergeSort : SortingAlgorithm
             while (ir < end)
             {
                 SyncPoint(ir);
-                _dTemp[it] = _data[ir];
+                _dTemp[it] = Data[ir];
                 ir++;
                 it++;
             }
@@ -66,17 +76,17 @@ public class MergeSort : SortingAlgorithm
         // copy back
         for (int i = 0; i < len; i++)
         {
-            _data[begin + i] = _dTemp[i];
+            Data[begin + i] = _dTemp[i];
             SyncPoint(begin +i);
         }
     }
 
     private void SyncPoint(int a, int? b = null)
     {
-        Array.Fill(_palette, 0xFF_FFFFFF);
-        _palette[a] = 0xFF_CC0000;
+        Palette.Fill(0xFF_FFFFFF);
+        Palette[a] = 0xFF_CC0000;
         if (b.HasValue && b < Data.Length)
-            _palette[b.Value] = 0xFF_CC0000;
+            Palette[b.Value] = 0xFF_CC0000;
         SyncPoint();
     }
 }

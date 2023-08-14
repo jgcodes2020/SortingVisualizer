@@ -31,7 +31,7 @@ public static class ArrayHelpers
             return _rng.GenerateNext((uint) boundL);
 
         ulong boundUL = (ulong) boundL;
-        ulong maxUL = (0 - boundUL) % boundUL;
+        ulong maxUL = unchecked(0 - boundUL) % boundUL;
         while (true)
         {
             ulong value = ((ulong) _rng.GenerateNext() << 32) | _rng.GenerateNext();
@@ -43,10 +43,9 @@ public static class ArrayHelpers
 
     public static void Shuffle<T>(T[] array)
     {
-        if (array.LongLength > uint.MaxValue)
-            throw new ArgumentException("Array is too long!");
-        if (array.LongLength <= 1)
+        if (array.LongLength <= 1) 
             return;
+
         for (long i = array.LongLength; i > 1;)
         {
             long n = GeneratePositive(i--);
@@ -60,6 +59,31 @@ public static class ArrayHelpers
         for (long i = 0; i < array.LongLength; i++)
         {
             array[i] = p;
+            p += step;
+        }
+    }
+
+    public static void Shuffle<T>(this Span<T> data)
+    {
+        if (data.IsEmpty)
+            throw new ArgumentException("Span was empty!", nameof(data));
+        if (data.Length <= 1)
+            return;
+        for (int i = data.Length; i > 1;)
+        {
+            int n = (int) _rng.GenerateNext((uint) i--);
+            (data[i], data[n]) = (data[n], data[i]);
+        }
+    }
+
+    public static void FillRange<T>(this Span<T> data, T first, T step) where T : IBinaryInteger<T>
+    {
+        if (data.IsEmpty)
+            throw new ArgumentException("Span was empty!", nameof(data));
+        T p = first;
+        for (int i = 0; i < data.Length; i++)
+        {
+            data[i] = p;
             p += step;
         }
     }

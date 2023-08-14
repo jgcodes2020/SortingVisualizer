@@ -22,7 +22,7 @@ public class SceneManager
     }
     
     private GL _gl;
-    private BufferObject _dataBuffer;
+    private BufferObject DataBuffer;
     private BufferObject _paletteBuffer;
     private VertexArray _vertexArray;
     private ShaderProgram _shader;
@@ -38,21 +38,21 @@ public class SceneManager
         InitInput(input);
     }
 
-    [MemberNotNull(nameof(_gl), nameof(_dataBuffer), nameof(_paletteBuffer))]
+    [MemberNotNull(nameof(_gl), nameof(DataBuffer), nameof(_paletteBuffer))]
     [MemberNotNull(nameof(_vertexArray), nameof(_shader))]
     private void InitOpenGL(GL gl)
     {
         _gl = gl;
 
-        _dataBuffer = new BufferObject(_gl, VertexBufferObjectUsage.DynamicDraw);
-        _dataBuffer.LoadData(_algorithm.Data);
+        DataBuffer = new BufferObject(_gl, VertexBufferObjectUsage.DynamicDraw);
+        DataBuffer.LoadData(_algorithm.Data);
         
         _paletteBuffer = new BufferObject(_gl, VertexBufferObjectUsage.DynamicDraw);
         _paletteBuffer.LoadData(_algorithm.Palette);
 
         _vertexArray = new VertexArray(_gl);
         _vertexArray.AttachVertexBuffer(0, 
-            buffer: _dataBuffer, 
+            buffer: DataBuffer, 
             elementSize: sizeof(uint));
         _vertexArray.AttachVertexBuffer(1, 
             buffer: _paletteBuffer, 
@@ -116,18 +116,18 @@ public class SceneManager
         }
         if (CheckAndClear(KeybindMask.Shuffle))
         {
-            _algorithm.Reset(ArrayHelpers.Shuffle);
+            _algorithm.Reset(x => x.Shuffle());
         }
 
         if (CheckAndClear(KeybindMask.Reverse))
         {
-            _algorithm.Reset(Array.Reverse);
+            _algorithm.Reset(x => x.Reverse());
         }
     }
 
     public void Render()
     {
-        _dataBuffer.LoadData(_algorithm.Data);
+        DataBuffer.LoadData(_algorithm.Data);
         _paletteBuffer.LoadData(_algorithm.Palette);
         
         _shader.MakeCurrent();

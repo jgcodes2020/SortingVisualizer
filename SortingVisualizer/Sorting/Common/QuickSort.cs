@@ -2,13 +2,13 @@ namespace SortingVisualizer.Sorting.Common;
 
 public class QuickSort : SortingAlgorithm
 {
-    public QuickSort(int length) : base(length)
+    public QuickSort(BufferSet buffers) : base(buffers)
     {
     }
 
     protected override void DoSorting()
     {
-        DoSorting(0, _data.Length - 1);
+        DoSorting(0, Data.Length - 1);
     }
 
     private void DoSorting(int begin, int end)
@@ -21,26 +21,26 @@ public class QuickSort : SortingAlgorithm
         {
             int mid = (begin + end) / 2;
 
-            if (_data[mid] > _data[begin] != _data[mid] > _data[end])
-                (_data[begin], _data[mid]) = (_data[mid], _data[begin]);
-            else if (_data[end] > _data[mid] != _data[end] > _data[begin])
-                (_data[begin], _data[end]) = (_data[end], _data[begin]);
+            if (Data[mid] > Data[begin] != Data[mid] > Data[end])
+                (Data[begin], Data[mid]) = (Data[mid], Data[begin]);
+            else if (Data[end] > Data[mid] != Data[end] > Data[begin])
+                (Data[begin], Data[end]) = (Data[end], Data[begin]);
         }
         
         // Partitioning
         int curtain;
         {
-            uint pivot = _data[begin];
+            uint pivot = Data[begin];
             int i = begin, j = end;
             while (true)
             {
-                while (_data[i] < pivot)
+                while (Data[i] < pivot)
                 {
                     i++;
                     SyncPoint(i, j);
                 }
 
-                while (_data[j] > pivot)
+                while (Data[j] > pivot)
                 {
                     j--;
                     SyncPoint(i, j);
@@ -52,7 +52,7 @@ public class QuickSort : SortingAlgorithm
                     break;
                 }
             
-                (_data[i], _data[j]) = (_data[j], _data[i]);
+                (Data[i], Data[j]) = (Data[j], Data[i]);
                 SyncPoint(i, j);
             }
         }
@@ -64,15 +64,15 @@ public class QuickSort : SortingAlgorithm
 
     private void SyncPoint(int i, int j)
     {
-        Array.Fill(_palette, 0xFF_FFFFFF);
-        _palette[i] = 0xFF_CC0000;
-        _palette[j] = 0xFF_CC0000;
+        Palette.Fill(0xFF_FFFFFF);
+        Palette[i] = 0xFF_CC0000;
+        Palette[j] = 0xFF_CC0000;
         SyncPoint();
     }
 
     private void SyncPointBlank()
     {
-        Array.Fill(_palette, 0xFF_FFFFFF);
+        Palette.Fill(0xFF_FFFFFF);
         SyncPoint();
     }
 }

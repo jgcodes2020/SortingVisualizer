@@ -24,7 +24,7 @@ public static class Program
     
     public static void Main(string[] args)
     {
-        _algorithm = new HeapSort(30) { SyncDelay = TimeSpan.FromMilliseconds(30) };
+        _algorithm = new HeapSort(new SortingAlgorithm.BufferSet(new uint[30], new uint[30])) { SyncDelay = TimeSpan.FromMilliseconds(30) };
         
         _window = Window.Create(WindowOptions.Default with
         {

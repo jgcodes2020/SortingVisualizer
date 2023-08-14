@@ -8,6 +8,24 @@ namespace SortingVisualizer.Sorting;
 /// </summary>
 public abstract class SortingAlgorithm
 {
+    public delegate void ShuffleCallback(Span<uint> data);
+
+    public class BufferSet
+    {
+        public BufferSet(Memory<uint> data, Memory<uint> palette)
+        {
+            if (data.Length != palette.Length)
+                throw new ArgumentException("");
+            Data = data;
+            Palette = palette;
+        }
+
+        public Memory<uint> Data { get; }
+        public Memory<uint> Palette { get; }
+
+        public int Length => Data.Length;
+    }
+
     [Flags]
     private enum PlayState : uint
     {
@@ -18,12 +36,17 @@ public abstract class SortingAlgorithm
         Advance = 0x0001_0001,
     }
 
-    protected readonly uint[] _data;
-    protected readonly uint[] _palette;
+    private BufferSet _buffers;
     public TimeSpan SyncDelay { get; set; }
 
-    public ReadOnlySpan<uint> Data => _data;
-    public ReadOnlySpan<uint> Palette => _palette;
+    public Span<uint> Data => Buffers.Data.Span;
+    public Span<uint> Palette => Buffers.Palette.Span;
+
+    public virtual BufferSet Buffers
+    {
+        get => _buffers;
+        set => _buffers = value;
+    }
 
     private PlayState _state;
     private bool _requestPauseState;
@@ -32,13 +55,12 @@ public abstract class SortingAlgorithm
     private AutoResetEvent _advanceEvent;
     private ManualResetEvent _genericStopEvent;
 
-    protected SortingAlgorithm(int length)
+    protected SortingAlgorithm(BufferSet buffers)
     {
-        _data = new uint[length];
-        _palette = new uint[length];
+        Buffers = buffers;
         SyncDelay = TimeSpan.FromMilliseconds(50);
-        ArrayHelpers.FillRange(_data, 1U, 1U);
-        Array.Fill(_palette, 0xFF_FFFFFFU);
+        Data.FillRange(1U, 1U);
+        Palette.Fill(0xFF_FFFFFFU);
 
         _state = PlayState.Stop;
         _advanceEvent = new AutoResetEvent(false);
@@ -49,7 +71,7 @@ public abstract class SortingAlgorithm
 
     protected virtual void DoReset()
     {
-        Array.Fill(_palette, 0xFF_FFFFFF);
+        Palette.Fill(0xFF_FFFFFF);
     }
 
     public void StartSync()
@@ -121,11 +143,11 @@ public abstract class SortingAlgorithm
         _advanceEvent.Set();
         _genericStopEvent.WaitOne();
     }
-    
-    public void Reset(Action<uint[]> permuter)
+
+    public void Reset(ShuffleCallback permuter)
     {
         Stop();
-        permuter(_data);
+        permuter(Data);
     }
 
     public void Pause()

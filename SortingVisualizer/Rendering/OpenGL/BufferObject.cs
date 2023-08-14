@@ -18,6 +18,13 @@ public sealed class BufferObject : IDisposable
     public void LoadData<T>(ReadOnlySpan<T> data, VertexBufferObjectUsage? usage = null) where T : unmanaged
     {
         _gl.NamedBufferData(_handle, data, usage ?? _usage);
+        Span<int> x = new Span<int>(null);
+        var y = (ReadOnlySpan<int>) x;
+    }
+
+    public void LoadData<T>(Span<T> data, VertexBufferObjectUsage? usage = null) where T : unmanaged
+    {
+        LoadData((ReadOnlySpan<T>) data, usage);
     }
 
     public void Dispose()
