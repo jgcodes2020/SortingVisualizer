@@ -37,13 +37,13 @@ public class QuickSort : SortingAlgorithm
                 while (Data[i] < pivot)
                 {
                     i++;
-                    SyncPoint(i, j);
+                    PartitionSyncPoint(begin, end, i, j);
                 }
 
                 while (Data[j] > pivot)
                 {
                     j--;
-                    SyncPoint(i, j);
+                    PartitionSyncPoint(begin, end, i, j);
                 }
 
                 if (i >= j)
@@ -53,7 +53,7 @@ public class QuickSort : SortingAlgorithm
                 }
             
                 (Data[i], Data[j]) = (Data[j], Data[i]);
-                SyncPoint(i, j);
+                PartitionSyncPoint(begin, end, i, j);
             }
         }
         
@@ -62,11 +62,13 @@ public class QuickSort : SortingAlgorithm
         DoSorting(curtain + 1, end);
     }
 
-    private void SyncPoint(int i, int j)
+    private void PartitionSyncPoint(int begin, int end, int i, int j)
     {
         Palette.Fill(0xFF_FFFFFF);
+        Palette[begin..i].Fill(0xFF_FFFF80);
         Palette[i] = 0xFF_CC0000;
         Palette[j] = 0xFF_CC0000;
+        Palette[(j+1)..(end+1)].Fill(0xFF_80FFFF);
         SyncPoint();
     }
 

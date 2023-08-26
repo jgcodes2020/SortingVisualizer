@@ -6,6 +6,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
+using SortingVisualizer.Misc;
 using SortingVisualizer.Rendering;
 using SortingVisualizer.Rendering.OpenGL;
 using SortingVisualizer.Sorting;
@@ -21,7 +22,9 @@ public static class Program
     private static IInputContext _input = null!;
     private static GL _gl = null!;
 
-    private static ImGuiController _gui;
+    private static ImGuiController _imGui;
+    private static UIManager _ui;
+    private static SortRenderer _sort;
     
     public static void Main(string[] args)
     {
@@ -44,32 +47,55 @@ public static class Program
         _gl = _window.CreateOpenGL();
         _input = _window.CreateInput();
 
-        _gui = new ImGuiController(_gl, _window, _input);
+        _imGui = new ImGuiController(_gl, _window, _input);
+
+        _ui = new UIManager();
+        {
+            var alg = (SortingAlgorithm) Activator.CreateInstance(_ui.CurrentAlgorithm,
+                SortingAlgorithm.BufferSet.Sequence(_ui.DataLength))!;
+            
+            _sort = new SortRenderer(_gl, alg);
+        }
         
         _window.MakeCurrent();
-        _gl.CheckVersion(4, 5);
         
-        InitOpenGL();
-    }
-
-    private static unsafe void InitOpenGL()
-    {
+        _gl.CheckVersion(4, 5);
         _gl.ClearColor(Color.Black);
     }
     
     private static void OnUpdate(double dt)
     {
-        _gui.Update((float) dt);
-        using (ImGuiExt.FillViewport())
+        _imGui.Update((float) dt);
+        _ui.SetDrawList(_window.Size);
+
+        if (_ui.ParametersUpdated())
         {
-            ImGui.Text("Hello, world!");
+            _sort.Algorithm?.Stop();
+            _sort.Algorithm = (SortingAlgorithm) Activator.CreateInstance(_ui.CurrentAlgorithm,
+                SortingAlgorithm.BufferSet.Sequence(_ui.DataLength))!;
+        }
+
+        if (_ui.ShufflePressed())
+        {
+            _sort.Algorithm?.Reset(span => span.Shuffle());
+        }
+
+        if (_ui.StartPressed())
+        {
+            if (!_sort.Algorithm?.IsRunning ?? false)
+                Task.Run(() => _sort.Algorithm?.StartSync());
         }
     }
     
     private static void OnRender(double dt)
     {
-        _gl.Viewport(new Vector2D<int>(0, 0), _window.FramebufferSize);
+        _gl.Viewport(_window.Size);
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        _gui.Render();
+        _imGui.Render();
+
+        _gl.Viewport(UIManager.DockWidth, 0, (uint) (_window.Size.X - UIManager.DockWidth), (uint) _window.Size.Y);
+        _sort.Render();
+        
+        _gl.Viewport(_window.Size);
     }
 }

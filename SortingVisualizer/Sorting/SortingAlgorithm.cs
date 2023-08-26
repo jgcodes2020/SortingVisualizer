@@ -28,6 +28,17 @@ public abstract class SortingAlgorithm
 
         public int Length => Data.Length;
         public uint MaxValue { get; }
+
+        public static BufferSet Sequence(int n)
+        {
+            var data = new uint[n];
+            var palette = new uint[n];
+            
+            ArrayHelpers.FillRange(data, 1u, 1u);
+            Array.Fill(palette, 0xFF_FFFFFF);
+
+            return new BufferSet(data, palette);
+        }
     }
 
     [Flags]
@@ -45,6 +56,8 @@ public abstract class SortingAlgorithm
 
     public Span<uint> Data => Buffers.Data.Span;
     public Span<uint> Palette => Buffers.Palette.Span;
+
+    public bool IsRunning => _state != PlayState.Stop;
 
     public virtual BufferSet Buffers
     {

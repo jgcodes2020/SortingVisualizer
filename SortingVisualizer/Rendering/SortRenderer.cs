@@ -16,36 +16,23 @@ public class SortRenderer
     private BufferObject _paletteBuffer;
     private VertexArray _vertexArray;
     private ShaderProgram _shader;
-    
-    private SortingAlgorithm _algorithm;
 
-    public SortRenderer(GL gl, SortingAlgorithm algorithm)
+    public SortRenderer(GL gl, SortingAlgorithm? algorithm)
     {
         Algorithm = algorithm;
         InitOpenGL(gl);
     }
 
-    public SortingAlgorithm Algorithm
-    {
-        get => _algorithm;
-        set
-        {
-            _algorithm = value;
-            
-        }
-    }
+    public SortingAlgorithm? Algorithm { get; set; }
 
     [MemberNotNull(nameof(_gl), nameof(_dataBuffer), nameof(_paletteBuffer))]
     [MemberNotNull(nameof(_vertexArray), nameof(_shader))]
     private void InitOpenGL(GL gl)
     {
         _gl = gl;
-
-        _dataBuffer = new BufferObject(_gl, VertexBufferObjectUsage.DynamicDraw);
-        _dataBuffer.LoadData(Algorithm.Data);
         
+        _dataBuffer = new BufferObject(_gl, VertexBufferObjectUsage.DynamicDraw);
         _paletteBuffer = new BufferObject(_gl, VertexBufferObjectUsage.DynamicDraw);
-        _paletteBuffer.LoadData(Algorithm.Palette);
 
         _vertexArray = new VertexArray(_gl);
         _vertexArray.AttachVertexBuffer(0, 
@@ -71,11 +58,19 @@ public class SortRenderer
             { ShaderType.GeometryShader, new Uri("netres://SortingVisualizer/Assets/Shaders/bars.geom") },
             { ShaderType.FragmentShader, new Uri("netres://SortingVisualizer/Assets/Shaders/bars.frag") }
         });
-        _shader.Uniform(0, new Vector2(Algorithm.Buffers.Length, Algorithm.Buffers.MaxValue));
+
+        if (Algorithm != null)
+        {
+            _dataBuffer.LoadData(Algorithm.Data);
+            _paletteBuffer.LoadData(Algorithm.Palette);
+            _shader.Uniform(0, new Vector2(Algorithm.Buffers.Length, Algorithm.Buffers.MaxValue));
+        }
     }
 
     public void Render()
     {
+        if (Algorithm == null)
+            return;
         _dataBuffer.LoadData(Algorithm.Data);
         _paletteBuffer.LoadData(Algorithm.Palette);
         _shader.Uniform(0, new Vector2(Algorithm.Buffers.Length, Algorithm.Buffers.MaxValue));

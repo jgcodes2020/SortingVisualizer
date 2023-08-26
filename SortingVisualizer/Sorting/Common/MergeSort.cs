@@ -41,7 +41,7 @@ public class MergeSort : SortingAlgorithm
             int il = begin, ir = mid;
             while (il < mid && ir < end)
             {
-                SyncPoint(il, ir);
+                MergeSyncPoint(begin, mid, end, il, ir);
                 if (Data[il] <= Data[ir])
                 {
                     _dTemp[it] = Data[il];
@@ -58,7 +58,7 @@ public class MergeSort : SortingAlgorithm
 
             while (il < mid)
             {
-                SyncPoint(il);
+                MergeSyncPoint(begin, mid, end, il);
                 _dTemp[it] = Data[il];
                 il++;
                 it++;
@@ -66,27 +66,39 @@ public class MergeSort : SortingAlgorithm
 
             while (ir < end)
             {
-                SyncPoint(ir);
+                MergeSyncPoint(begin, mid, end, ir);
                 _dTemp[it] = Data[ir];
                 ir++;
                 it++;
             }
-            SyncPoint(il, ir);
+            MergeSyncPoint(begin, mid, end, il, ir);
         }
         // copy back
         for (int i = 0; i < len; i++)
         {
             Data[begin + i] = _dTemp[i];
-            SyncPoint(begin +i);
+            CopySyncPoint(begin, end, begin + i);
         }
     }
 
-    private void SyncPoint(int a, int? b = null)
+    private void MergeSyncPoint(int begin, int mid, int end, int a, int? b = null)
     {
         Palette.Fill(0xFF_FFFFFF);
+        Palette[begin..mid].Fill(0xFF_FFFF80);
+        Palette[mid..end].Fill(0xFF_80FFFF);
+        
         Palette[a] = 0xFF_CC0000;
-        if (b.HasValue && b < Data.Length)
+        if (b < end)
             Palette[b.Value] = 0xFF_CC0000;
+        SyncPoint();
+    }
+
+    private void CopySyncPoint(int begin, int end, int i)
+    {
+        Palette.Fill(0xFF_FFFFFF);
+        Palette[begin..i].Fill(0xFF_80FF80);
+        Palette[i] = 0xFF_CC0000;
+        
         SyncPoint();
     }
 }
