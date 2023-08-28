@@ -50,7 +50,6 @@ public class UIManager
 
     public void SetDrawList(Vector2D<int> screenSize)
     {
-        _dataLen = Math.Clamp(_dataLen, 5, screenSize.X - DockWidth);
         using (ImGuiExt.DockViewport(DockWidth))
         {
             ImGui.Text("Algorithm");
@@ -65,6 +64,8 @@ public class UIManager
             ImGui.SameLine();
             _startPressed = ImGui.Button("Start");
         }
+        
+        _dataLen = Math.Clamp(_dataLen, 5, screenSize.X - DockWidth);
     }
 
     public bool StartPressed()

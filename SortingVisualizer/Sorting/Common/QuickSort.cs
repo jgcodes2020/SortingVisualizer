@@ -21,10 +21,16 @@ public class QuickSort : SortingAlgorithm
         {
             int mid = (begin + end) / 2;
 
+            PivotSyncPoint(begin, end, mid);
             if (Data[mid] > Data[begin] != Data[mid] > Data[end])
                 (Data[begin], Data[mid]) = (Data[mid], Data[begin]);
-            else if (Data[end] > Data[mid] != Data[end] > Data[begin])
-                (Data[begin], Data[end]) = (Data[end], Data[begin]);
+            else
+            {
+                PivotSyncPoint(begin, end, end);
+                if (Data[end] > Data[mid] != Data[end] > Data[begin])
+                    (Data[begin], Data[end]) = (Data[end], Data[begin]);
+            }
+            PivotSyncPoint(begin, end, begin);
         }
         
         // Partitioning
@@ -65,6 +71,7 @@ public class QuickSort : SortingAlgorithm
     private void PartitionSyncPoint(int begin, int end, int i, int j)
     {
         Palette.Fill(0xFF_FFFFFF);
+        Palette[begin..(end + 1)].Fill(0xFF_FF8080);
         Palette[begin..i].Fill(0xFF_FFFF80);
         Palette[i] = 0xFF_CC0000;
         Palette[j] = 0xFF_CC0000;
@@ -72,9 +79,11 @@ public class QuickSort : SortingAlgorithm
         SyncPoint();
     }
 
-    private void SyncPointBlank()
+    private void PivotSyncPoint(int begin, int end, int i)
     {
         Palette.Fill(0xFF_FFFFFF);
+        Palette[begin..(end + 1)].Fill(0xFF_FF8080);
+        Palette[i] = 0xFF_CC0000;
         SyncPoint();
     }
 }
