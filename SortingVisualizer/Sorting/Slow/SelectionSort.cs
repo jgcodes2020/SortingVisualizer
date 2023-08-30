@@ -1,5 +1,9 @@
 namespace SortingVisualizer.Sorting.Slow;
 
+/// <summary>
+/// Selection sort. Works by repeatedly selecting the minimum element and
+/// moving it to a sorted portion.
+/// </summary>
 public class SelectionSort : SortingAlgorithm
 {
     public SelectionSort(BufferSet buffers) : base(buffers)

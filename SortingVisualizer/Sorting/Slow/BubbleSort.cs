@@ -1,5 +1,9 @@
 namespace SortingVisualizer.Sorting.Slow;
 
+/// <summary>
+/// Bubble sort. Works by iteratively swapping adjacent elements, bubbling the
+/// highest element to the top with each pass.
+/// </summary>
 public class BubbleSort : SortingAlgorithm
 {
     public BubbleSort(BufferSet buffers) : base(buffers)

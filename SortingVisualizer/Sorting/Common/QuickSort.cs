@@ -1,5 +1,8 @@
 namespace SortingVisualizer.Sorting.Common;
 
+/// <summary>
+/// Quicksort. Works by repeatedly partitioning an array based on a pivot.
+/// </summary>
 public class QuickSort : SortingAlgorithm
 {
     public QuickSort(BufferSet buffers) : base(buffers)

@@ -1,5 +1,8 @@
 namespace SortingVisualizer.Sorting.Common;
 
+/// <summary>
+/// Merge sort. Works by recursively merging two sorted halves.
+/// </summary>
 public class MergeSort : SortingAlgorithm
 {
     private uint[] _dTemp;

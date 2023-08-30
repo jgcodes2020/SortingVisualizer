@@ -1,5 +1,9 @@
 namespace SortingVisualizer.Sorting.Common;
 
+/// <summary>
+/// Heap sort. Works by constructing a binary heap in-place in the
+/// array, then repeatedly extracting from it.
+/// </summary>
 public class HeapSort : SortingAlgorithm
 {
     public HeapSort(BufferSet buffers) : base(buffers)

@@ -18,6 +18,8 @@ namespace SortingVisualizer;
 
 public static class Program
 {
+    private static readonly TimeSpan OneSecond = TimeSpan.FromSeconds(1);
+    
     private static IWindow _window = null!;
     private static IInputContext _input = null!;
     private static GL _gl = null!;
@@ -32,6 +34,8 @@ public static class Program
         {
             Size = new Vector2D<int>(800, 600),
             Title = "Sorting Visualizer",
+            // GRAPHICS SETTINGS
+            Samples = 4
         });
         _window.Load += OnLoad;
         _window.Update += OnUpdate;
@@ -53,6 +57,7 @@ public static class Program
         {
             var alg = (SortingAlgorithm) Activator.CreateInstance(_ui.CurrentAlgorithm,
                 SortingAlgorithm.BufferSet.Sequence(_ui.DataLength))!;
+            alg.SyncDelay = OneSecond / _ui.Speed;
             
             _sort = new SortRenderer(_gl, alg);
         }
@@ -68,22 +73,53 @@ public static class Program
         _imGui.Update((float) dt);
         _ui.SetDrawList(_window.Size);
 
-        if (_ui.ParametersUpdated())
+        HandleUIUpdates();
+        HandleUIActions();
+        
+    }
+
+    private static void HandleUIUpdates()
+    {
+        if (_sort.Algorithm == null)
+            return;
+        
+        if (_ui.AlgorithmUpdated)
         {
-            _sort.Algorithm?.Stop();
+            _sort.Algorithm.Stop();
+            var oldBufferSet = _sort.Algorithm?.Buffers;
             _sort.Algorithm = (SortingAlgorithm) Activator.CreateInstance(_ui.CurrentAlgorithm,
-                SortingAlgorithm.BufferSet.Sequence(_ui.DataLength))!;
+                oldBufferSet ?? SortingAlgorithm.BufferSet.Sequence(_ui.DataLength))!;
+            _sort.Algorithm.SyncDelay = OneSecond / _ui.Speed;
         }
 
-        if (_ui.ShufflePressed())
+        if (_ui.LengthUpdated)
+        {
+            _sort.Algorithm.Stop();
+            _sort.Algorithm.Buffers = SortingAlgorithm.BufferSet.Sequence(_ui.DataLength); 
+        }
+
+        if (_ui.SpeedUpdated)
+        {
+            _sort.Algorithm.SyncDelay = OneSecond / _ui.Speed;
+        }
+    }
+
+    private static void HandleUIActions()
+    {
+        if (_ui.ShufflePressed)
         {
             _sort.Algorithm?.Reset(span => span.Shuffle());
         }
 
-        if (_ui.StartPressed())
+        if (_ui.StartPressed)
         {
             if (!_sort.Algorithm?.IsRunning ?? false)
                 Task.Run(() => _sort.Algorithm?.StartSync());
+        }
+
+        if (_ui.ResetPressed)
+        {
+            _sort.Algorithm?.Reset(span => span.Sort());
         }
     }
     

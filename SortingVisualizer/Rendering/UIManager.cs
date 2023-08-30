@@ -32,49 +32,53 @@ public class UIManager
     }
     
     private int _currAlg;
-    private int _dataLen = 20;
+    private int _dataLen = 100;
+    private int _speed = 50;
     
-    private bool _shouldUpdate;
+    private bool _algorithmUpdated;
+    private bool _lengthUpdated;
+    private bool _speedUpdated;
+    
     private bool _shufflePressed;
     private bool _startPressed;
+    private bool _resetPressed;
 
     public Type CurrentAlgorithm => Algorithms[_currAlg];
     public int DataLength => _dataLen;
+    public int Speed => _speed;
 
-    public bool ParametersUpdated()
-    {
-        var res = _shouldUpdate;
-        _shouldUpdate = false;
-        return res;
-    }
+    public bool AlgorithmUpdated => TestAndReset(ref _algorithmUpdated);
+    public bool LengthUpdated => TestAndReset(ref _lengthUpdated);
+    public bool SpeedUpdated => TestAndReset(ref _speedUpdated);
+    
+    public bool StartPressed => TestAndReset(ref _startPressed);
+    public bool ShufflePressed => TestAndReset(ref _shufflePressed);
+    public bool ResetPressed => TestAndReset(ref _resetPressed);
 
     public void SetDrawList(Vector2D<int> screenSize)
     {
         using (ImGuiExt.DockViewport(DockWidth))
         {
             ImGui.Text("Algorithm");
-            _shouldUpdate |= ImGui.ListBox("##Algorithm", ref _currAlg, AlgorithmNames, AlgorithmNames.Length, 10);
+            _algorithmUpdated |= ImGui.ListBox("##Algorithm", ref _currAlg, AlgorithmNames, AlgorithmNames.Length, 10);
             ImGui.Spacing();
             
             ImGui.Text("Length");
-            _shouldUpdate |= ImGui.InputInt("##Length", ref _dataLen, 5, 10);
+            _lengthUpdated |= ImGui.InputInt("##Length", ref _dataLen, 5, 10);
+            ImGui.Spacing();
+            
+            ImGui.Text("Speed (updates/s)");
+            _speedUpdated |= ImGui.InputInt("##Speed", ref _speed, 2, 10);
             ImGui.Spacing();
             
             _shufflePressed = ImGui.Button("Shuffle");
             ImGui.SameLine();
             _startPressed = ImGui.Button("Start");
+
+            _resetPressed = ImGui.Button("Reset");
         }
         
         _dataLen = Math.Clamp(_dataLen, 5, screenSize.X - DockWidth);
-    }
-
-    public bool StartPressed()
-    {
-        return TestAndReset(ref _startPressed);
-    }
-
-    public bool ShufflePressed()
-    {
-        return TestAndReset(ref _shufflePressed);
+        _speed = Math.Clamp(_speed, 2, 1200);
     }
 }

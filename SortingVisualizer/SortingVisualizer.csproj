@@ -20,11 +20,6 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Assets\Shaders\*.*"/>
-
-
-
-
-
     </ItemGroup>
 
 
