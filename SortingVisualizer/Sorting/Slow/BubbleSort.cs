@@ -33,8 +33,11 @@ public class BubbleSort : SortingAlgorithm
     private void SyncPoint(int i, int j)
     {
         Palette.Fill(0xFF_FFFFFF);
-        Palette[i..].Fill(0xFF_80FF80);
-        Palette[i] = 0xFF_00CC00;
+        if (i + 1 < Data.Length)
+        {
+            Palette[(i + 1)..].Fill(0xFF_80FF80);
+            Palette[i + 1] = 0xFF_00CC00;
+        }
         Palette[j] = 0xFF_CC0000;
         Palette[j + 1] = 0xFF_CC0000;
         SyncPoint();

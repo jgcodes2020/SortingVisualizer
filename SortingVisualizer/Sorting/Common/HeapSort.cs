@@ -53,7 +53,7 @@ public class HeapSort : SortingAlgorithm
                 Palette[i] = 0xFF_FFFFFF;
             else
             {
-                Palette[i] = ((32 - int.LeadingZeroCount(i)) % 3) switch
+                Palette[i] = ((32 - int.LeadingZeroCount(i + 1)) % 3) switch
                 {
                     0 => 0xFF_FFFF80,
                     1 => 0xFF_80FFFF,
