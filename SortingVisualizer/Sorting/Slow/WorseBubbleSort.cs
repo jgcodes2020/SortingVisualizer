@@ -6,9 +6,9 @@ namespace SortingVisualizer.Sorting.Slow;
 /// In addition, it's very easy to add an early break if the array is already sorted, but
 /// this is not done either.
 /// </summary>
-public class UnoptimizedBubbleSort : SortingAlgorithm
+public class WorseBubbleSort : SortingAlgorithm
 {
-    public UnoptimizedBubbleSort(BufferSet buffers) : base(buffers)
+    public WorseBubbleSort(BufferSet buffers) : base(buffers)
     {
     }
     
